@@ -4,10 +4,14 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -16,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.nbeforegame.data.Elements;
 
@@ -27,9 +32,10 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Elements> elementsArrayList = new ArrayList<>();
+    private int score = 0;
+    private double scoreMultiplier = 1;
     private int stepBack = 1;
-
-    private boolean waiter = true;
+    int progress = 100;
 
     private CardView cardViewElement1;
     private CardView cardViewElement2;
@@ -71,8 +77,26 @@ public class MainActivity extends AppCompatActivity {
         textViewStepBackNum = findViewById(R.id.textViewStepBackNum);
         progressBar = findViewById(R.id.progressBar);
 
-        progressBar.setProgress(100);
+
+        progressBar.setProgress(progress);
+        textViewScore.setText(Integer.toString(score));
         addElements();
+        CountDownTimer timer = new CountDownTimer(20000,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                progressBar.incrementProgressBy(-5);
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(MainActivity.this, "ВСЕ ДОИГРАЛСЯ", Toast.LENGTH_LONG).show();
+                score = 0;
+                progress = 100;
+                progressBar.setProgress(progress);
+                textViewScore.setText(Integer.toString(score));
+            }
+        };
+        timer.start();
     }
 
     private void addElements() {
@@ -204,10 +228,14 @@ public class MainActivity extends AppCompatActivity {
         if (compareElements(elements, 1, stepBack)) {
             buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
+            scoreMultiplier += 0.5;
+            score += 1 * scoreMultiplier;
         } else {
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
             buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorRed));
+            scoreMultiplier = 1;
         }
+        textViewScore.setText(String.format("%d", score));
         addElements();
         new Thread(new Runnable() {
             @Override
@@ -233,10 +261,14 @@ public class MainActivity extends AppCompatActivity {
         if (compareElements(elements, 2, stepBack)) {
             buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
+            scoreMultiplier += 0.5;
+            score += 1 * scoreMultiplier;
         } else {
             buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
+            scoreMultiplier = 1;
         }
+        textViewScore.setText(String.format("%d", score));
         addElements();
         new Thread(new Runnable() {
             @Override
@@ -258,10 +290,14 @@ public class MainActivity extends AppCompatActivity {
         if (compareElements(elements, 3, stepBack)) {
             buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
+            scoreMultiplier += 0.5;
+            score += 1 * scoreMultiplier;
         } else {
             buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
+            scoreMultiplier = 1;
         }
+        textViewScore.setText(String.format("%d", score));
         addElements();
         new Thread(new Runnable() {
             @Override
@@ -283,10 +319,14 @@ public class MainActivity extends AppCompatActivity {
         if (compareElements(elements, 0, stepBack)) {
             buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
+            scoreMultiplier += 0.5;
+            score += 1 * scoreMultiplier;
         } else {
             buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
+            scoreMultiplier = 1;
         }
+        textViewScore.setText(String.format("%d", score));
         addElements();
         new Thread(new Runnable() {
             @Override
