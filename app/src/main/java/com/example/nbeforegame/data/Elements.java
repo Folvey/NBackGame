@@ -1,4 +1,4 @@
-package com.example.nbeforegame;
+package com.example.nbeforegame.data;
 
 public class Elements {
     private int number;
@@ -15,23 +15,12 @@ public class Elements {
         return number;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
     public int getFigure() {
         return figure;
-    }
-
-    public void setFigure(int figure) {
-        this.figure = figure;
     }
 
     public int getColor() {
         return color;
     }
 
-    public void setColor(int color) {
-        this.color = color;
-    }
 }

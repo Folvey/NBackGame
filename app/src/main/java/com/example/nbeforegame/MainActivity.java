@@ -5,20 +5,32 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.nbeforegame.data.Elements;
+
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Elements> elementsArrayList = new ArrayList<>();
     private int stepBack = 1;
+
+    private boolean waiter = true;
+
     private CardView cardViewElement1;
     private CardView cardViewElement2;
     private CardView cardViewElement3;
@@ -26,11 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonAnswer2;
     private Button buttonAnswer3;
     private Button buttonAnswer0;
-    private ImageView imageViewElement2;
     private ImageView imageViewLife1;
     private ImageView imageViewLife2;
     private ImageView imageViewLife3;
-    private TextView textViewElement3;
     private TextView textViewAnswerResult;
     private TextView textViewScore;
     private TextView textViewStepBack;
@@ -45,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-
         cardViewElement1 = findViewById(R.id.cardViewElement1);
         cardViewElement2 = findViewById(R.id.cardViewElement2);
         cardViewElement3 = findViewById(R.id.cardViewElement3);
@@ -53,11 +62,9 @@ public class MainActivity extends AppCompatActivity {
         buttonAnswer2 = findViewById(R.id.buttonAnswer2);
         buttonAnswer3 = findViewById(R.id.buttonAnswer3);
         buttonAnswer0 = findViewById(R.id.buttonAnswer0);
-        imageViewElement2 = findViewById(R.id.imageViewElement2);
         imageViewLife1 = findViewById(R.id.imageViewLife1);
         imageViewLife2 = findViewById(R.id.imageViewLife2);
         imageViewLife3 = findViewById(R.id.imageViewLife3);
-        textViewElement3 = findViewById(R.id.textViewElement3);
         textViewAnswerResult = findViewById(R.id.textViewAnswerResult);
         textViewScore = findViewById(R.id.textViewScore);
         textViewStepBack = findViewById(R.id.textViewStepBack);
@@ -71,20 +78,80 @@ public class MainActivity extends AppCompatActivity {
     private void addElements() {
         Elements elements = createElements();
         elementsArrayList.add(elements);
-        int color = elements.getColor();
-        cardViewElement1.setCardBackgroundColor(color);
-        imageViewElement2.setImageResource(elements.getFigure());
-        String number = Integer.toString(elements.getNumber());
-        textViewElement3.setText(number);
+        clearElementContainers();
+        shuffleContainers(elements);
     }
 
-    private void setColorToElement() {
-        int i = getResources().getColor(R.color.colorAccent);
-        cardViewElement1.setCardBackgroundColor(i);
+    private void clearElementContainers() {
+        cardViewElement1.removeAllViewsInLayout();
+        cardViewElement1.setCardBackgroundColor(getResources().getColor(R.color.colorWhite));
+        cardViewElement2.removeAllViewsInLayout();
+        cardViewElement2.setCardBackgroundColor(getResources().getColor(R.color.colorWhite));
+        cardViewElement3.removeAllViewsInLayout();
+        cardViewElement3.setCardBackgroundColor(getResources().getColor(R.color.colorWhite));
     }
 
-    //neeed to rise chance of 3x match of elements
+    private TextView createTextViewNumber(int number) {
+        TextView elemNum = new TextView(this);
+        String num = Integer.toString(number);
+        elemNum.setText(num);
+        elemNum.setTextSize(36);
+        elemNum.setGravity(Gravity.CENTER);
+        return elemNum;
+    }
+
+    private void shuffleContainers(Elements elements) {
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(0);
+        list.add(1);
+        list.add(2);
+        Random rand = new Random();
+        int container = 0;
+        while (container < 3) {
+            int i = rand.nextInt(list.size());
+            int element = list.get(i);
+            Log.i("dbg", String.valueOf(element));
+            if (element == 0) {
+                //set figure
+                ImageView figure = new ImageView(this);
+                figure.setImageResource(elements.getFigure());
+                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                if (container == 1)
+                    cardViewElement1.addView(figure, layoutParams);
+                else if (container == 2)
+                    cardViewElement2.addView(figure, layoutParams);
+                else
+                    cardViewElement3.addView(figure, layoutParams);
+            } else if (element == 1) {
+                //set color
+                int color = elements.getColor();
+                if (container == 1)
+                    cardViewElement1.setCardBackgroundColor(color);
+                else if (container == 2)
+                    cardViewElement2.setCardBackgroundColor(color);
+                else
+                    cardViewElement3.setCardBackgroundColor(color);
+            } else if (element == 2) {
+                // set number
+                TextView elemNum = createTextViewNumber(elements.getNumber());
+                if (container == 1)
+                    cardViewElement1.addView(elemNum);
+                else if (container == 2)
+                    cardViewElement2.addView(elemNum);
+                else
+                    cardViewElement3.addView(elemNum);
+            }
+            list.remove(i);
+            container++;
+        }
+    }
+
     private Elements createElements() {
+        Random random = new Random();
+        int i = random.nextInt(100) + 1;
+        if (!elementsArrayList.isEmpty() && i < 20) {
+            return elementsArrayList.get(elementsArrayList.size() - 1);
+        }
         return new Elements(randNumber(), randFigure(), randColor());
     }
 
@@ -110,11 +177,11 @@ public class MainActivity extends AppCompatActivity {
         int color;
         int colorRand = rand.nextInt(3) + 1;
         if (colorRand == 1)
-            color = getResources().getColor(R.color.colorPrimaryDark);
+            color = getResources().getColor(R.color.colorPrimary);
         else if (colorRand == 2)
             color = getResources().getColor(R.color.colorYellow);
         else
-            color = getResources().getColor(R.color.colorGreen);
+            color = getResources().getColor(R.color.colorDarkGreen);
         return color;
     }
 
@@ -135,38 +202,103 @@ public class MainActivity extends AppCompatActivity {
         textViewAnswerResult.setText("1");
         Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
         if (compareElements(elements, 1, stepBack)) {
+            buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-        }
-        else
+        } else {
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
+            buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorRed));
+        }
         addElements();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SystemClock.sleep(150);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        buttonAnswer1.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
+                    }
+                });
+            }
+        }).start();
     }
+
+    private void setButtonColorToWhite(Button button) {
+        button.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+    }
+
     public void onClickButtonAnswer2(View view) {
         textViewAnswerResult.setText("2");
         Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
         if (compareElements(elements, 2, stepBack)) {
+            buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-        }
-        else
+        } else {
+            buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
+        }
         addElements();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SystemClock.sleep(150);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        buttonAnswer2.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
+                    }
+                });
+            }
+        }).start();
     }
+
     public void onClickButtonAnswer3(View view) {
         textViewAnswerResult.setText("3");
         Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
-        if (compareElements(elements, 3, stepBack))
+        if (compareElements(elements, 3, stepBack)) {
+            buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-        else
+        } else {
+            buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
+        }
         addElements();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SystemClock.sleep(150);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        buttonAnswer3.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
+                    }
+                });
+            }
+        }).start();
     }
+
     public void onClickButtonAnswer0(View view) {
         textViewAnswerResult.setText("0");
         Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
-        if (compareElements(elements, 0, stepBack))
+        if (compareElements(elements, 0, stepBack)) {
+            buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-        else
+        } else {
+            buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
+        }
         addElements();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SystemClock.sleep(150);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        buttonAnswer0.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
+                    }
+                });
+            }
+        }).start();
     }
 }
