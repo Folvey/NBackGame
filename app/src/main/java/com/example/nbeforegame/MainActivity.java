@@ -81,22 +81,29 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setProgress(progress);
         textViewScore.setText(Integer.toString(score));
         addElements();
-        CountDownTimer timer = new CountDownTimer(20000,1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                progressBar.incrementProgressBy(-5);
-            }
+        new Timer(20000, 200).start();
 
-            @Override
-            public void onFinish() {
-                Toast.makeText(MainActivity.this, "ВСЕ ДОИГРАЛСЯ", Toast.LENGTH_LONG).show();
-                score = 0;
-                progress = 100;
-                progressBar.setProgress(progress);
-                textViewScore.setText(Integer.toString(score));
-            }
-        };
-        timer.start();
+    }
+
+    class Timer extends android.os.CountDownTimer {
+
+        public Timer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            progressBar.incrementProgressBy(-1);
+        }
+
+        @Override
+        public void onFinish() {
+            Toast.makeText(MainActivity.this, "ВСЕ ДОИГРАЛСЯ", Toast.LENGTH_LONG).show();
+            score = 0;
+            progress = 100;
+            progressBar.setProgress(progress);
+            textViewScore.setText(Integer.toString(score));
+        }
     }
 
     private void addElements() {
