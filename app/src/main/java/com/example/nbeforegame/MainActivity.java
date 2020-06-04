@@ -3,6 +3,11 @@ package com.example.nbeforegame;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,19 +28,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.nbeforegame.data.Elements;
+import com.example.nbeforegame.data.MainViewModel;
+import com.example.nbeforegame.data.MainViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<Elements> elementsArrayList = new ArrayList<>();
-    private int score = 0;
-    private double scoreMultiplier = 1;
-    private int stepBack = 1;
-    int progress = 100;
+    private MainViewModel viewModel;
 
     private CardView cardViewElement1;
     private CardView cardViewElement2;
@@ -77,10 +80,24 @@ public class MainActivity extends AppCompatActivity {
         textViewStepBackNum = findViewById(R.id.textViewStepBackNum);
         progressBar = findViewById(R.id.progressBar);
 
-
-        progressBar.setProgress(progress);
-        textViewScore.setText(Integer.toString(score));
-        addElements();
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
+        MutableLiveData<Elements> elementsLiveData = viewModel.getElements();
+        elementsLiveData.observe(this, new Observer<Elements>() {
+            @Override
+            public void onChanged(Elements elements) {
+                clearElementContainers();
+                setAndShuffleElements(elements);
+            }
+        });
+        MutableLiveData<Integer> scoreLiveData =  viewModel.getScore();
+        scoreLiveData.observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                String score = Integer.toString(integer);
+                textViewScore.setText(score);
+            }
+        });
+        progressBar.setProgress(100);
         new Timer(20000, 200).start();
 
     }
@@ -99,18 +116,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onFinish() {
             Toast.makeText(MainActivity.this, "ВСЕ ДОИГРАЛСЯ", Toast.LENGTH_LONG).show();
-            score = 0;
-            progress = 100;
-            progressBar.setProgress(progress);
-            textViewScore.setText(Integer.toString(score));
+            viewModel.setLiveDataScore(0);
         }
-    }
-
-    private void addElements() {
-        Elements elements = createElements();
-        elementsArrayList.add(elements);
-        clearElementContainers();
-        shuffleContainers(elements);
     }
 
     private void clearElementContainers() {
@@ -131,12 +138,12 @@ public class MainActivity extends AppCompatActivity {
         return elemNum;
     }
 
-    private void shuffleContainers(Elements elements) {
+    private void setAndShuffleElements(Elements elements) {
+        Random rand = new Random();
         ArrayList<Integer> list = new ArrayList<>();
         list.add(0);
         list.add(1);
         list.add(2);
-        Random rand = new Random();
         int container = 0;
         while (container < 3) {
             int i = rand.nextInt(list.size());
@@ -177,73 +184,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Elements createElements() {
-        Random random = new Random();
-        int i = random.nextInt(100) + 1;
-        if (!elementsArrayList.isEmpty() && i < 20) {
-            return elementsArrayList.get(elementsArrayList.size() - 1);
-        }
-        return new Elements(randNumber(), randFigure(), randColor());
-    }
-
-    private int randNumber() {
-        return new Random().nextInt(3) + 1;
-    }
-
-    private int randFigure() {
-        Random random = new Random();
-        int i = random.nextInt(3) + 1;
-        int figure;
-        if (i == 1)
-            figure = R.drawable.triangle_tight;
-        else if (i == 2)
-            figure = R.drawable.circle;
-        else
-            figure = R.drawable.square_tight2;
-        return figure;
-    }
-
-    private int randColor() {
-        Random rand = new Random();
-        int color;
-        int colorRand = rand.nextInt(3) + 1;
-        if (colorRand == 1)
-            color = getResources().getColor(R.color.colorPrimary);
-        else if (colorRand == 2)
-            color = getResources().getColor(R.color.colorYellow);
-        else
-            color = getResources().getColor(R.color.colorDarkGreen);
-        return color;
-    }
-
-    private boolean compareElements(Elements elementsToCompare, int answer, int stepBack) {
-        int i = elementsArrayList.size() - 1 - stepBack;
-        int matches = 0;
-        if (i < 0) {
-            return answer == 0;
-        }
-        Elements elements = elementsArrayList.get(i);
-        if (elementsToCompare.getColor() == elements.getColor()) matches++;
-        if (elementsToCompare.getFigure() == elements.getFigure()) matches++;
-        if (elementsToCompare.getNumber() == elements.getNumber()) matches++;
-        return answer == matches;
-    }
-
     public void onClickButtonAnswer1(View view) {
         textViewAnswerResult.setText("1");
-        Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
-        if (compareElements(elements, 1, stepBack)) {
+        if (viewModel.compareElements(1)) {
             buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-            scoreMultiplier += 0.5;
-            score += 1 * scoreMultiplier;
         } else {
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
             buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorRed));
-            scoreMultiplier = 1;
         }
-        textViewScore.setText(String.format("%d", score));
-        addElements();
+        viewModel.addElements();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -258,25 +209,17 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void setButtonColorToWhite(Button button) {
-        button.setBackgroundColor(getResources().getColor(R.color.colorWhite));
-    }
-
     public void onClickButtonAnswer2(View view) {
         textViewAnswerResult.setText("2");
-        Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
-        if (compareElements(elements, 2, stepBack)) {
+        if (viewModel.compareElements(2)) {
             buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-            scoreMultiplier += 0.5;
-            score += 1 * scoreMultiplier;
         } else {
-            buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
-            scoreMultiplier = 1;
+            buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
-        textViewScore.setText(String.format("%d", score));
-        addElements();
+        viewModel.addElements();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -293,19 +236,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickButtonAnswer3(View view) {
         textViewAnswerResult.setText("3");
-        Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
-        if (compareElements(elements, 3, stepBack)) {
+        if (viewModel.compareElements(3)) {
             buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-            scoreMultiplier += 0.5;
-            score += 1 * scoreMultiplier;
         } else {
-            buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
-            scoreMultiplier = 1;
+            buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
-        textViewScore.setText(String.format("%d", score));
-        addElements();
+        viewModel.addElements();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -322,19 +261,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickButtonAnswer0(View view) {
         textViewAnswerResult.setText("0");
-        Elements elements = elementsArrayList.get(elementsArrayList.size() - 1);
-        if (compareElements(elements, 0, stepBack)) {
+        if (viewModel.compareElements(0)) {
             buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
-            scoreMultiplier += 0.5;
-            score += 1 * scoreMultiplier;
         } else {
-            buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorRed));
             textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
-            scoreMultiplier = 1;
+            buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
-        textViewScore.setText(String.format("%d", score));
-        addElements();
+        viewModel.addElements();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
