@@ -21,6 +21,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -50,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageViewLife1;
     private ImageView imageViewLife2;
     private ImageView imageViewLife3;
-    private TextView textViewAnswerResult;
     private TextView textViewScore;
     private TextView textViewStepBack;
     private TextView textViewStepBackNum;
@@ -74,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         imageViewLife1 = findViewById(R.id.imageViewLife1);
         imageViewLife2 = findViewById(R.id.imageViewLife2);
         imageViewLife3 = findViewById(R.id.imageViewLife3);
-        textViewAnswerResult = findViewById(R.id.textViewAnswerResult);
         textViewScore = findViewById(R.id.textViewScore);
         textViewStepBack = findViewById(R.id.textViewStepBack);
         textViewStepBackNum = findViewById(R.id.textViewStepBackNum);
@@ -115,8 +115,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onFinish() {
-            Toast.makeText(MainActivity.this, "ВСЕ ДОИГРАЛСЯ", Toast.LENGTH_LONG).show();
+            int score = viewModel.getScore().getValue();
             viewModel.setLiveDataScore(0);
+            Toast.makeText(MainActivity.this, "ВСЕ ДОИГРАЛСЯ", Toast.LENGTH_LONG).show();
+            Intent startResultActivity = new Intent(MainActivity.this, ResultsActivity.class);
+            Log.d("MainActivity", "score " + Integer.toString(score));
+            startResultActivity.putExtra("score", score);
+            startActivity(startResultActivity);
         }
     }
 
@@ -129,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         cardViewElement3.setCardBackgroundColor(getResources().getColor(R.color.colorWhite));
     }
 
-    private TextView createTextViewNumber(int number) {
+    public TextView createTextViewNumber(int number) {
         TextView elemNum = new TextView(this);
         String num = Integer.toString(number);
         elemNum.setText(num);
@@ -185,20 +190,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickButtonAnswer1(View view) {
-        textViewAnswerResult.setText("1");
         if (viewModel.compareElements(1)) {
             buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorGreen));
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
         } else {
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
             buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
+        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
+        buttonAnswer1.startAnimation(animationFading);
         viewModel.addElements();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                SystemClock.sleep(150);
+                SystemClock.sleep(200);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -210,20 +214,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickButtonAnswer2(View view) {
-        textViewAnswerResult.setText("2");
         if (viewModel.compareElements(2)) {
             buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorGreen));
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
         } else {
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
             buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
+        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
+        buttonAnswer2.startAnimation(animationFading);
         viewModel.addElements();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                SystemClock.sleep(150);
+                SystemClock.sleep(200);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -235,20 +238,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickButtonAnswer3(View view) {
-        textViewAnswerResult.setText("3");
         if (viewModel.compareElements(3)) {
             buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorGreen));
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
         } else {
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
             buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
         viewModel.addElements();
-
+        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
+        buttonAnswer3.startAnimation(animationFading);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                SystemClock.sleep(150);
+                SystemClock.sleep(200);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -260,20 +261,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickButtonAnswer0(View view) {
-        textViewAnswerResult.setText("0");
         if (viewModel.compareElements(0)) {
             buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorGreen));
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorGreen));
         } else {
-            textViewAnswerResult.setTextColor(getResources().getColor(R.color.colorRed));
             buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
         viewModel.addElements();
-
+        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
+        buttonAnswer0.startAnimation(animationFading);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                SystemClock.sleep(150);
+                SystemClock.sleep(200);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -21,15 +21,14 @@ import java.util.Random;
 
 public class MainViewModel extends AndroidViewModel {
 
-
+    private Application application;
     private MutableLiveData<Elements> liveDataElements = new MutableLiveData<>();
-    private ArrayList<Elements> elementsArrayList = new ArrayList<>();
     private MutableLiveData<Integer> liveDataScore = new MutableLiveData<>();
     private MutableLiveData<Integer> liveDataProgress = new MutableLiveData<>();
+    private ArrayList<Elements> elementsArrayList = new ArrayList<>();
+    private int stepBack = 1;
     private int score = 0;
     private double scoreMultiplier = 1;
-    private int stepBack = 1;
-    private Application application;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -109,7 +108,6 @@ public class MainViewModel extends AndroidViewModel {
         }
         Elements elements = elementsArrayList.get(i);
         Elements elementsToCompare = liveDataElements.getValue();
-//        Elements elementsToCompare = elementsArrayList.get(i + stepBack);
         if (elementsToCompare.getColor() == elements.getColor()) matches++;
         if (elementsToCompare.getFigure() == elements.getFigure()) matches++;
         if (elementsToCompare.getNumber() == elements.getNumber()) matches++;
