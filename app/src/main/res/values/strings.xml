@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">N Before Game</string>
+    <string name="app_name">N Back Game</string>
+    <string name="played_enough">НУ ВСЕ НАИГРАЛСЯ</string>
+    <string name="best_result">Лучший результат</string>
+    <string name="your_result">Твой результат</string>
+    <string name="start_again">Начать заново</string>
 </resources>

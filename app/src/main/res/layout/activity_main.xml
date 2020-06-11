@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/mainLayout">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewElement1"
@@ -17,10 +18,11 @@
 
         <ImageView
             android:id="@+id/imageViewElement1"
-            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/triangle_tight" />
+            android:layout_margin="8dp"
+            android:visibility="visible"
+            app:srcCompat="@drawable/triangle_glyph" />
 
         <TextView
             android:id="@+id/textViewElement1"
@@ -28,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:textColor="@android:color/black"
             android:text="3"
             android:textSize="36sp" />
 
@@ -46,10 +49,11 @@
 
         <ImageView
             android:id="@+id/imageViewElement2"
-            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/triangle_tight" />
+            android:layout_margin="10dp"
+            android:visibility="visible"
+            app:srcCompat="@drawable/square_glyph" />
 
         <TextView
             android:id="@+id/textViewElement2"
@@ -57,6 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:textColor="@android:color/black"
             android:text="3"
             android:textSize="36sp" />
     </androidx.cardview.widget.CardView>
@@ -72,10 +77,11 @@
 
         <ImageView
             android:id="@+id/imageViewElement3"
-            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/triangle_tight" />
+            android:layout_margin="8dp"
+            android:visibility="visible"
+            app:srcCompat="@drawable/rhomb_glyph" />
 
         <TextView
             android:id="@+id/textViewElement3"
@@ -83,6 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:textColor="@android:color/black"
             android:text="3"
             android:textSize="36sp" />
 
@@ -90,7 +97,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayoutAnswers"
-        android:padding="8dp"
+        android:padding="6dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -99,32 +106,35 @@
         <Button
             android:id="@+id/buttonAnswer1"
             android:onClick="onClickButtonAnswer1"
+            android:background="@drawable/button_default"
+            android:textColor="@android:color/black"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:background="@android:color/white"
             android:text="1"
             android:textSize="22sp"/>
 
         <Button
             android:id="@+id/buttonAnswer2"
             android:onClick="onClickButtonAnswer2"
+            android:background="@drawable/button_default"
+            android:textColor="@android:color/black"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
-            android:background="@android:color/white"
             android:text="2"
             android:textSize="22sp"/>
 
         <Button
             android:id="@+id/buttonAnswer3"
             android:onClick="onClickButtonAnswer3"
+            android:background="@drawable/button_default"
+            android:textColor="@android:color/black"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="6dp"
             android:layout_weight="1"
-            android:background="@android:color/white"
             android:text="3"
             android:textSize="22sp"/>
     </LinearLayout>
@@ -134,39 +144,28 @@
         android:onClick="onClickButtonAnswer0"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
         android:layout_marginBottom="12dp"
-        android:background="@android:color/white"
+        android:background="@drawable/transition_wtg_button"
+        android:textColor="@android:color/black"
         android:text="0"
         android:textSize="22sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/textViewAnswerResult"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:text="1"
-        android:textSize="22sp"
-        android:textColor="@android:color/holo_green_light"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayoutAnswers"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardViewElement2" />
-
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
-        android:layout_height="8dp"
+        android:layout_height="20dp"
         android:layout_margin="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/cardViewElement2"
+        android:progress="100"
+        android:progressDrawable="@drawable/pb_drawable"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewStepBackNum" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textViewScore"
@@ -174,18 +173,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:text="Счет"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textViewStepBack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="Шаг назад"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintStart_toStartOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
     <ImageView
         android:id="@+id/imageViewLife1"
@@ -193,9 +184,11 @@
         android:layout_height="18dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
-        app:layout_constraintEnd_toStartOf="@id/imageViewLife2"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/heart" />
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewLife2"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewLife2"
+        app:layout_constraintTop_toTopOf="@+id/imageViewLife2"
+        app:srcCompat="@drawable/hexagon" />
 
     <ImageView
         android:id="@+id/imageViewLife2"
@@ -203,28 +196,20 @@
         android:layout_height="18dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
-        app:layout_constraintEnd_toStartOf="@id/imageViewLife3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/heart" />
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewLife3"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewLife3"
+        app:layout_constraintTop_toTopOf="@+id/imageViewLife3"
+        app:srcCompat="@drawable/hexagon" />
 
     <ImageView
         android:id="@+id/imageViewLife3"
         android:layout_width="18dp"
         android:layout_height="18dp"
+        android:layout_margin="4dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/heart" />
-
-    <TextView
-        android:id="@+id/textViewStepBackNum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="1"
-        app:layout_constraintEnd_toEndOf="@+id/textViewStepBack"
-        app:layout_constraintStart_toStartOf="@+id/textViewStepBack"
-        app:layout_constraintTop_toBottomOf="@+id/textViewStepBack" />
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:srcCompat="@drawable/hexagon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

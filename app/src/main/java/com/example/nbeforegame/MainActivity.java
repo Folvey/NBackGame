@@ -1,22 +1,16 @@
 package com.example.nbeforegame;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.lifecycle.LiveData;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.AsyncTask;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -27,20 +21,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.nbeforegame.data.Elements;
 import com.example.nbeforegame.data.MainViewModel;
 import com.example.nbeforegame.data.MainViewModelFactory;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
-    private MainViewModel viewModel;
 
     private CardView cardViewElement1;
     private CardView cardViewElement2;
@@ -53,34 +42,19 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageViewLife2;
     private ImageView imageViewLife3;
     private TextView textViewScore;
-    private TextView textViewStepBack;
-    private TextView textViewStepBackNum;
     private ProgressBar progressBar;
+    private ConstraintLayout rootLayout;
+
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        cardViewElement1 = findViewById(R.id.cardViewElement1);
-        cardViewElement2 = findViewById(R.id.cardViewElement2);
-        cardViewElement3 = findViewById(R.id.cardViewElement3);
-        buttonAnswer1 = findViewById(R.id.buttonAnswer1);
-        buttonAnswer2 = findViewById(R.id.buttonAnswer2);
-        buttonAnswer3 = findViewById(R.id.buttonAnswer3);
-        buttonAnswer0 = findViewById(R.id.buttonAnswer0);
-        imageViewLife1 = findViewById(R.id.imageViewLife1);
-        imageViewLife2 = findViewById(R.id.imageViewLife2);
-        imageViewLife3 = findViewById(R.id.imageViewLife3);
-        textViewScore = findViewById(R.id.textViewScore);
-        textViewStepBack = findViewById(R.id.textViewStepBack);
-        textViewStepBackNum = findViewById(R.id.textViewStepBackNum);
-        progressBar = findViewById(R.id.progressBar);
 
-        viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
+//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        init();
+
         MutableLiveData<Elements> elementsLiveData = viewModel.getElements();
         elementsLiveData.observe(this, new Observer<Elements>() {
             @Override
@@ -97,44 +71,47 @@ public class MainActivity extends AppCompatActivity {
                 textViewScore.setText(score);
             }
         });
-        progressBar.setProgress(100);
-        new Timer(20000, 200).start();
-
+        final MutableLiveData<Integer> timeLiveData = viewModel.getLiveDataTime();
+        timeLiveData.observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                progressBar.setProgress(timeLiveData.getValue());
+            }
+        });
     }
 
-    class Timer extends android.os.CountDownTimer {
-
-        public Timer(long millisInFuture, long countDownInterval) {
-            super(millisInFuture, countDownInterval);
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-            progressBar.incrementProgressBy(-1);
-        }
-
-        @Override
-        public void onFinish() {
-            int score = viewModel.getScore().getValue();
-            viewModel.setLiveDataScore(0);
-            Toast.makeText(MainActivity.this, "ВСЕ ДОИГРАЛСЯ", Toast.LENGTH_LONG).show();
-            Intent startResultActivity = new Intent(MainActivity.this, ResultsActivity.class);
-            Log.d("MainActivity", "score " + Integer.toString(score));
-            startResultActivity.putExtra("score", score);
-            startActivity(startResultActivity);
-        }
+    private void init() {
+        cardViewElement1 = findViewById(R.id.cardViewElement1);
+        cardViewElement2 = findViewById(R.id.cardViewElement2);
+        cardViewElement3 = findViewById(R.id.cardViewElement3);
+        buttonAnswer1 = findViewById(R.id.buttonAnswer1);
+        buttonAnswer2 = findViewById(R.id.buttonAnswer2);
+        buttonAnswer3 = findViewById(R.id.buttonAnswer3);
+        buttonAnswer0 = findViewById(R.id.buttonAnswer0);
+        imageViewLife1 = findViewById(R.id.imageViewLife1);
+        imageViewLife2 = findViewById(R.id.imageViewLife2);
+        imageViewLife3 = findViewById(R.id.imageViewLife3);
+        textViewScore = findViewById(R.id.textViewScore);
+        progressBar = findViewById(R.id.progressBar);
+        rootLayout = findViewById(R.id.mainLayout);
+        viewModel = new ViewModelProvider(this, new MainViewModelFactory(this.getApplication())).get(MainViewModel.class);
+        progressBar.setProgress(100);
     }
 
     private void clearElementContainers() {
+        Animation appear = AnimationUtils.loadAnimation(this, R.anim.appear);
         cardViewElement1.removeAllViewsInLayout();
         cardViewElement1.setCardBackgroundColor(getResources().getColor(R.color.colorWhite));
         cardViewElement2.removeAllViewsInLayout();
         cardViewElement2.setCardBackgroundColor(getResources().getColor(R.color.colorWhite));
         cardViewElement3.removeAllViewsInLayout();
         cardViewElement3.setCardBackgroundColor(getResources().getColor(R.color.colorWhite));
+        cardViewElement1.setAnimation(appear);
+        cardViewElement2.setAnimation(appear);
+        cardViewElement3.setAnimation(appear);
     }
 
-    public TextView createTextViewNumber(int number) {
+    private TextView createTextViewNumber(int number) {
         TextView elemNum = new TextView(this);
         String num = Integer.toString(number);
         elemNum.setText(num);
@@ -156,9 +133,14 @@ public class MainActivity extends AppCompatActivity {
             Log.i("dbg", String.valueOf(element));
             if (element == 0) {
                 //set figure
+                int square = R.drawable.square_glyph;
                 ImageView figure = new ImageView(this);
                 figure.setImageResource(elements.getFigure());
-                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                CardView.LayoutParams layoutParams = new CardView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                if (elements.getFigure() == square)
+                    layoutParams.setMargins(12, 12,12,12);
+                else
+                    layoutParams.setMargins(10, 10,10,10);
                 if (container == 1)
                     cardViewElement1.addView(figure, layoutParams);
                 else if (container == 2)
@@ -190,96 +172,114 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickButtonAnswer1(View view) {
+        final Drawable whiteToGreen = getDrawable(R.drawable.transition_wtg_button);
+        final Drawable whiteToRed = getDrawable(R.drawable.transition_wtr_button);
+        TransitionDrawable transitionDrawable;
         if (viewModel.compareElements(1)) {
-            buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+            buttonAnswer1.setBackground(whiteToGreen);
+            transitionDrawable = (TransitionDrawable) buttonAnswer1.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
         } else {
-            buttonAnswer1.setBackgroundColor(getResources().getColor(R.color.colorRed));
-        }
-        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
-        buttonAnswer1.startAnimation(animationFading);
-        viewModel.addElements();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(200);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        buttonAnswer1.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
-                    }
-                });
+            viewModel.lives--;
+            setLifeImages(viewModel.lives);
+            if (viewModel.lives <= 0) {
+                viewModel.stopGame();
             }
-        }).start();
+            buttonAnswer1.setBackground(whiteToRed);
+            transitionDrawable = (TransitionDrawable) buttonAnswer1.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
+        }
+        viewModel.addElements();
     }
 
     public void onClickButtonAnswer2(View view) {
+        final Drawable whiteToGreen = getDrawable(R.drawable.transition_wtg_button);
+        final Drawable whiteToRed = getDrawable(R.drawable.transition_wtr_button);
+        TransitionDrawable transitionDrawable;
         if (viewModel.compareElements(2)) {
-            buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+            buttonAnswer2.setBackground(whiteToGreen);
+            transitionDrawable = (TransitionDrawable) buttonAnswer2.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
         } else {
-            buttonAnswer2.setBackgroundColor(getResources().getColor(R.color.colorRed));
-        }
-        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
-        buttonAnswer2.startAnimation(animationFading);
-        viewModel.addElements();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(200);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        buttonAnswer2.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
-                    }
-                });
+            viewModel.lives--;
+            setLifeImages(viewModel.lives);
+            if (viewModel.lives <= 0) {
+                viewModel.stopGame();
             }
-        }).start();
+            buttonAnswer2.setBackground(whiteToRed);
+            transitionDrawable = (TransitionDrawable) buttonAnswer2.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
+        }
+        viewModel.addElements();
     }
 
     public void onClickButtonAnswer3(View view) {
+        final Drawable whiteToGreen = getDrawable(R.drawable.transition_wtg_button);
+        final Drawable whiteToRed = getDrawable(R.drawable.transition_wtr_button);
+        TransitionDrawable transitionDrawable;
         if (viewModel.compareElements(3)) {
-            buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+            buttonAnswer3.setBackground(whiteToGreen);
+            transitionDrawable = (TransitionDrawable) buttonAnswer3.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
         } else {
-            buttonAnswer3.setBackgroundColor(getResources().getColor(R.color.colorRed));
+            viewModel.lives--;
+            setLifeImages(viewModel.lives);
+            if (viewModel.lives <= 0) {
+                viewModel.stopGame();
+            }
+            buttonAnswer3.setBackground(whiteToRed);
+            transitionDrawable = (TransitionDrawable) buttonAnswer3.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
         }
         viewModel.addElements();
-        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
-        buttonAnswer3.startAnimation(animationFading);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(200);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        buttonAnswer3.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
-                    }
-                });
-            }
-        }).start();
     }
 
     public void onClickButtonAnswer0(View view) {
+        final Drawable whiteToGreen = getDrawable(R.drawable.transition_wtg_button);
+        final Drawable whiteToRed = getDrawable(R.drawable.transition_wtr_button);
+        TransitionDrawable transitionDrawable;
         if (viewModel.compareElements(0)) {
-            buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+            buttonAnswer0.setBackground(whiteToGreen);
+            transitionDrawable = (TransitionDrawable) buttonAnswer0.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
         } else {
-            buttonAnswer0.setBackgroundColor(getResources().getColor(R.color.colorRed));
+            viewModel.lives--;
+            setLifeImages(viewModel.lives);
+            if (viewModel.lives <= 0) {
+                viewModel.stopGame();
+            }
+            buttonAnswer0.setBackground(whiteToRed);
+            transitionDrawable = (TransitionDrawable) buttonAnswer0.getBackground();
+            transitionDrawable.startTransition(600);
+            transitionDrawable.reverseTransition(600);
         }
         viewModel.addElements();
-        Animation animationFading = AnimationUtils.loadAnimation(this, R.anim.fade);
-        buttonAnswer0.startAnimation(animationFading);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(200);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        buttonAnswer0.setBackgroundColor(Color.parseColor("#FFFFFF")); // use whatever other color you want here
-                    }
-                });
-            }
-        }).start();
     }
+
+    private void setLifeImages(Integer lives) {
+        if (lives == 3) {
+            imageViewLife1.setVisibility(View.VISIBLE);
+            imageViewLife2.setVisibility(View.VISIBLE);
+            imageViewLife3.setVisibility(View.VISIBLE);
+        } else if (lives == 2) {
+            imageViewLife3.setVisibility(View.INVISIBLE);
+        } else if (lives == 1) {
+            imageViewLife3.setVisibility(View.INVISIBLE);
+            imageViewLife2.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
 }
