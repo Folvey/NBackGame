@@ -13,10 +13,23 @@
     <color name="colorPink">#FF9494</color>
     <color name="colorDarkGreen">#00C853</color>
     <color name="colorYellowMaterial">#FFD600</color>
+    
+    <color name="colorVioletLight">#606200EE</color>
+    <color name="colorRedLight">#3CFF0000</color>
+    <color name="colorWhellow">#FFF3B7</color>
 
     <color name="colorTransparent">#00ffffff</color>
-    <color name="colorGradientStart">#D9FF43</color>
-    <color name="colorGradientCenter">#F67831</color>
-    <color name="colorGradientEnd">#FF1493</color>
+
+<!--    <color name="colorGradientStart">@color/colorBlue</color>-->
+<!--    <color name="colorGradientCenter">@color/colorRed</color>-->
+<!--    <color name="colorGradientEnd">@color/colorYellowMaterial</color>-->
+
+<!--    <color name="colorGradientStart">#9A6200EE</color>-->
+<!--    <color name="colorGradientCenter">#8BFF0000</color>-->
+<!--    <color name="colorGradientEnd">#85FFD400</color>-->
+
+    <color name="colorGradientStart">#DDFFD600</color>
+    <color name="colorGradientCenter">#DDFF0000</color>
+    <color name="colorGradientEnd">#D5FFD600</color>
 
 </resources>

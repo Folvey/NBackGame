@@ -34,7 +34,7 @@ public class MainViewModel extends AndroidViewModel {
     private int stepBack = 1;
     private int score = 0;
     private double scoreMultiplier = 1;
-    public int lives = 100;
+    public int lives = 3;
     public static final String KEY_BEST_SCORE = "bestScore";
     public GameTimer gameTimer = new GameTimer(20000, 200);
 

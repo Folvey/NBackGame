@@ -19,21 +19,40 @@ public class ResultsActivity extends AppCompatActivity {
 
     private TextView textViewNewScore;
     private TextView textViewBestScore;
+    private SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
 
-        ConstraintLayout rootLayout = findViewById(R.id.rootResultLayout);
-        AnimationDrawable animationDrawable = (AnimationDrawable) rootLayout.getBackground();
-        animationDrawable.setEnterFadeDuration(10);
-        animationDrawable.setExitFadeDuration(5000);
-        animationDrawable.start();
+        init();
+        getScore();
+    }
+
+    public void onClickStartAgain(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void init() {
         textViewNewScore = findViewById(R.id.textViewNewScore);
         textViewBestScore = findViewById(R.id.textViewBestScore);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String bestScore = Integer.toString(sharedPreferences.getInt(MainViewModel.KEY_BEST_SCORE, 0));
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    }
 
+    private void gradientAnimation() {
+        ConstraintLayout rootLayout = findViewById(R.id.rootResultLayout);
+        AnimationDrawable animationDrawable = (AnimationDrawable) getResources().getDrawable(R.drawable.gradient_background__animation);
+        animationDrawable.setEnterFadeDuration(1000);
+        animationDrawable.setExitFadeDuration(5000);
+        rootLayout.setBackground(animationDrawable);
+        animationDrawable.start();
+    }
+
+    private void getScore() {
+        String bestScore = Integer.toString(sharedPreferences.getInt(MainViewModel.KEY_BEST_SCORE, 0));
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("score")) {
             String scoreResult = Integer.toString(intent.getIntExtra("score", 0));
@@ -42,16 +61,5 @@ public class ResultsActivity extends AppCompatActivity {
             textViewNewScore.setText(scoreResult);
             textViewBestScore.setText(bestScore);
         }
-    }
-
-    public void onClickStartAgain(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 }

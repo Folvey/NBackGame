@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
 //        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         init();
-
         MutableLiveData<Elements> elementsLiveData = viewModel.getElements();
         elementsLiveData.observe(this, new Observer<Elements>() {
             @Override
